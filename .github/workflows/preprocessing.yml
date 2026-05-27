@@ -1,26 +1,39 @@
-name: Preprocessing Data
+name: Preprocessing
+
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
+
+permissions:
+  contents: write
+
 jobs:
-  build:
+  preprocess:
     runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.8'
-    - name: Install dependencies
-      run: pip install pandas scikit-learn
-    - name: Run Preprocessing
-      run: python automate_Nama-siswa.py
-    - name: Commit cleaned file
-      run: |
-        git config --global user.name "github-actions[bot]"
-        git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        
-        git add preprocessing/iris_cleaned.csv
-        git commit -m "Update preprocessed data" || echo "No changes"
-        
-        git push
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.8"
+
+      - name: Install dependencies
+        run: |
+          pip install pandas scikit-learn
+
+      - name: Run preprocessing
+        run: python preprocessing.py
+
+      - name: Commit changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add preprocessing/iris_cleaned.csv
+          git commit -m "Update preprocessed data" || echo "No changes"
+
+          git push
