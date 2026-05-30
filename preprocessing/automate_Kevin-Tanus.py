@@ -1,24 +1,40 @@
 import pandas as pd
+import numpy as np
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 
 def preprocess_data(input_path, output_path):
-    # Load
+    # Load Data
     df = pd.read_csv(input_path)
+    # Hapus Duplikat
+    df_clean = df.drop_duplicates().copy()
+    # Penanganan Outlier (IQR)
+    # Daftar kolom fitur (sesuaikan dengan nama kolom di CSV Anda)
+    feature_cols = [col for col in df_clean.columns if col not in ['target', 'species']]
+    for col in feature_cols:
+        Q1 = df_clean[col].quantile(0.25)
+        Q3 = df_clean[col].quantile(0.75)
+        IQR = Q3 - Q1
+        lower_bound = Q1 - 1.5 * IQR
+        upper_bound = Q3 + 1.5 * IQR
+        # Filter data
+        df_clean = df_clean[(df_clean[col] >= lower_bound) & (df_clean[col] <= upper_bound)]
     
-    # Preprocessing
-    df_clean = df.drop(columns=['target'])
+    # Encoding
     le = LabelEncoder()
-    df_clean['species_encoded'] = le.fit_transform(df_clean['species'])
-    
-    X = df_clean.drop(columns=['species', 'species_encoded'])
-    y = df_clean['species_encoded']
-    
+    if 'species' in df_clean.columns:
+        df_clean['target_encoded'] = le.fit_transform(df_clean['species'])
+        y = df_clean['target_encoded']
+    else:
+        y = df_clean['target']
+
+    # Scaling
+    X = df_clean[feature_cols]
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(X)
-    
-    df_preprocessed = pd.DataFrame(X_scaled, columns=X.columns)
-    df_preprocessed['target'] = y
-    
+    # Final DataFrame
+    df_preprocessed = pd.DataFrame(X_scaled, columns=feature_cols)
+    df_preprocessed['target'] = y.values
+
     # Save result
     df_preprocessed.to_csv(output_path, index=False)
     print(f'Data processed and saved to {output_path}')
