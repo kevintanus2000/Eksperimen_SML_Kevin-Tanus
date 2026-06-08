@@ -40,4 +40,4 @@ def preprocess_data(input_path, output_path):
     print(f'Data processed and saved to {output_path}')
 
 if __name__ == "__main__":
-    preprocess_data('iris_raw.csv', 'preprocessing/iris_cleaned.csv')
+    preprocess_data('breast_cancer_raw.csv', 'preprocessing/breast_cancer_cleaned.csv')
