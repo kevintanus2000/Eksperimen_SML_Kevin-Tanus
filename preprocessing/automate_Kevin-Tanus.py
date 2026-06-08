@@ -7,7 +7,7 @@ def preprocess_data(input_path, output_path):
     df = pd.read_csv(input_path)
     # Hapus Duplikat
     df_clean = df.drop_duplicates().copy()
-    
+    feature_cols = [col for col in df_clean.columns if col not in ['target', 'species']]
     # Encoding
     le = LabelEncoder()
     if 'species' in df_clean.columns:
