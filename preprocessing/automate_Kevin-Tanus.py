@@ -7,17 +7,6 @@ def preprocess_data(input_path, output_path):
     df = pd.read_csv(input_path)
     # Hapus Duplikat
     df_clean = df.drop_duplicates().copy()
-    # Penanganan Outlier (IQR)
-    # Daftar kolom fitur (sesuaikan dengan nama kolom di CSV Anda)
-    feature_cols = [col for col in df_clean.columns if col not in ['target', 'species']]
-    for col in feature_cols:
-        Q1 = df_clean[col].quantile(0.25)
-        Q3 = df_clean[col].quantile(0.75)
-        IQR = Q3 - Q1
-        lower_bound = Q1 - 1.5 * IQR
-        upper_bound = Q3 + 1.5 * IQR
-        # Filter data
-        df_clean = df_clean[(df_clean[col] >= lower_bound) & (df_clean[col] <= upper_bound)]
     
     # Encoding
     le = LabelEncoder()
